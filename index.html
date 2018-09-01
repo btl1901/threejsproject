@@ -1,13 +1,13 @@
 <html>
 
 <head>
-<title>three test</title>
+    <title>three test</title>
 
-<style>
-body
-{
-margin: 0;
-}
+    <style>
+        body
+        {
+            margin: 0;
+        }
 
 canvas
 {
@@ -39,4 +39,5 @@ camera.updateProjectionMatrix();
 
 var geometry = new THREE.BoxGeometry(1, 1, 1);
 
-var material = new THREE.
+var material = new THREE.MeshBasicMaterial({color: 0xff00ff, wireframe: true});
+    
