@@ -18,6 +18,7 @@
 
   <body>
     <script src="js/three.js"></script>
+    <script src="js/OrbitControls.js"></script>
 
     <script>
       var scene = new THREE.Scene();
@@ -37,19 +38,31 @@
         camera.updateProjectionMatrix();
       });
 
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+
 
       var geometry = new THREE.BoxGeometry(1, 1, 1);
 
-      var material = new THREE.MeshBasicMaterial({color: 0xFFFFFF, wireframe: true});
-      var cube = new THREE.Mesh(geometry, material);
+      var cubeMaterials =
+      [
+        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/0.jpg'), side: THREE.DoubleSide}), //r
+        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/1.jpg'), side: THREE.DoubleSide}), //l
+        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/2.jpg'), side: THREE.DoubleSide}), //t
+        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/3.jpg'), side: THREE.DoubleSide}), //bo
+        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/4.jpg'), side: THREE.DoubleSide}), //f
+        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/5.jpg'), side: THREE.DoubleSide})  //ba
+      ];
+
+      var material = new THREE.MeshBasicMaterial(cubeMaterials);//{color: 0xFF00FF, wireframe: true});
+      var cube = new THREE.Mesh(geometry, cubeMaterials);
       scene.add(cube);
 
       camera.position.z = 3;
 
       var update= function ()
       {
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.05;
+        cube.rotation.x += 0.00;
+        cube.rotation.y += 0.00;
       };
 
       var render = function ()
@@ -59,7 +72,7 @@
 
       var GameLoop = function ()
       {
-        requestAnimationframe(GameLoop);
+        requestAnimationFrame(GameLoop);
         update();
         render();
       }
