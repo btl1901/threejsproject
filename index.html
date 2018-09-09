@@ -1,6 +1,6 @@
 <html>
   <head>
-      <title>e test</title>
+      <title>Is it Wednesday my dudes?</title>
 
       <style>
           body
@@ -27,6 +27,7 @@
       var renderer = new THREE.WebGLRenderer();
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
+      scene.background = new THREE.Color(0xFF00FF);
 
 
       window.addEventListener('resize', function()
@@ -61,8 +62,9 @@
 
       var update= function ()
       {
-        cube.rotation.x += 0.00;
-        cube.rotation.y += 0.00;
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.02;
+        cube.rotation.z += 0.03;
       };
 
       var render = function ()
