@@ -46,10 +46,10 @@
 
       var cubeMaterials =
       [
-        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/0.jpg'), side: THREE.DoubleSide}), //r
-        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/1.jpg'), side: THREE.DoubleSide}), //l
-        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/2.jpg'), side: THREE.DoubleSide}), //t
-        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/3.jpg'), side: THREE.DoubleSide}), //bo
+        new THREE.MeshLambertMaterial({map: new THREE.TextureLoader().load('img/0.jpg'), side: THREE.DoubleSide}), //r
+        new THREE.MeshPhongMaterial({map: new THREE.TextureLoader().load('img/1.jpg'), side: THREE.DoubleSide}), //l
+        new THREE.MeshPhongMaterial({map: new THREE.TextureLoader().load('img/2.jpg'), side: THREE.DoubleSide}), //t
+        new THREE.MeshPhongMaterial({map: new THREE.TextureLoader().load('img/3.jpg'), side: THREE.DoubleSide}), //bo
         new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/4.jpg'), side: THREE.DoubleSide}), //f
         new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/5.jpg'), side: THREE.DoubleSide})  //ba
       ];
@@ -60,11 +60,39 @@
 
       camera.position.z = 3;
 
+      var ambientLight = new THREE.AmbientLight(0x00FFFF, 1);
+
+      var light1 = new THREE.PointLight(0x80FF80, 4, 50);
+      scene.add(light1);
+
+      var light2 = new THREE.PointLight(0x118080, 4, 50);
+      scene.add(light2);
+
+      var light3 = new THREE.PointLight(0x808011, 4, 50);
+      scene.add(light3);
+
+      scene.add(ambientLight);
+
       var update= function ()
       {
+        /*
         cube.rotation.x += 0.01;
         cube.rotation.y += 0.02;
         cube.rotation.z += 0.03;
+        */
+        var time = Date.now() * .005;
+
+        light1.position.x = Math.sin(time * .7) * 30;
+        light1.position.y = Math.sin(time * .5) * 40;
+        light1.position.z = Math.sin(time * .3) * 30;
+
+        light2.position.x = Math.sin(time * .7) * 30;
+        light2.position.y = Math.sin(time * .5) * 40;
+        light2.position.z = Math.sin(time * .3) * 30;
+
+        light3.position.x = Math.sin(time * .7) * 30;
+        light3.position.y = Math.sin(time * .5) * 40;
+        light3.position.z = Math.sin(time * .3) * 30;
       };
 
       var render = function ()
