@@ -19,6 +19,7 @@
   <body>
     <script src="js/three.js"></script>
     <script src="js/OrbitControls.js"></script>
+    <script src="js/ObjectLoader.js"></script>
 
     <script>
       var scene = new THREE.Scene();
@@ -41,17 +42,27 @@
 
       controls = new THREE.OrbitControls(camera, renderer.domElement);
 
+      var loader = new THREE.ObjectLoader();
 
+      loader.load
+      (
+        'models/droid.obj', // must me json
+
+        function(object)
+        {
+          scene.add(object);
+        }
+      );
       var geometry = new THREE.BoxGeometry(1, 1, 1);
 
       var cubeMaterials =
       [
-        new THREE.MeshLambertMaterial({map: new THREE.TextureLoader().load('img/0.jpg'), side: THREE.DoubleSide}), //r
+        new THREE.MeshPhongMaterial({map: new THREE.TextureLoader().load('img/0.jpg'), side: THREE.DoubleSide}), //r
         new THREE.MeshPhongMaterial({map: new THREE.TextureLoader().load('img/1.jpg'), side: THREE.DoubleSide}), //l
         new THREE.MeshPhongMaterial({map: new THREE.TextureLoader().load('img/2.jpg'), side: THREE.DoubleSide}), //t
         new THREE.MeshPhongMaterial({map: new THREE.TextureLoader().load('img/3.jpg'), side: THREE.DoubleSide}), //bo
-        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/4.jpg'), side: THREE.DoubleSide}), //f
-        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/5.jpg'), side: THREE.DoubleSide})  //ba
+        new THREE.MeshPhongMaterial({map: new THREE.TextureLoader().load('img/4.jpg'), side: THREE.DoubleSide}), //f
+        new THREE.MeshPhongMaterial({map: new THREE.TextureLoader().load('img/5.jpg'), side: THREE.DoubleSide})  //ba
       ];
 
       var material = new THREE.MeshBasicMaterial(cubeMaterials);//{color: 0xFF00FF, wireframe: true});
@@ -61,6 +72,7 @@
       camera.position.z = 3;
 
       var ambientLight = new THREE.AmbientLight(0x00FFFF, 1);
+      scene.add(ambientLight);
 
       var light1 = new THREE.PointLight(0x80FF80, 4, 50);
       scene.add(light1);
@@ -71,7 +83,14 @@
       var light3 = new THREE.PointLight(0x808011, 4, 50);
       scene.add(light3);
 
-      scene.add(ambientLight);
+      var directionalLight = new THREE.DirectionalLight(0xFFFFFF);
+      directionalLight.position.set(3, 2, 1);
+      scene.add(directionalLight);
+
+      var spotLight = new THREE.SpotLight(0xFF45FF, 25);
+      spotLight.position.set(4, 3, 6);
+      scene.add(spotLight);
+
 
       var update= function ()
       {
