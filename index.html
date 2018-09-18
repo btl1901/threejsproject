@@ -20,10 +20,15 @@
     <script src="js/three.js"></script>
     <script src="js/OrbitControls.js"></script>
     <script src="js/STLLoader.js"></script>
+    <script src="js/postprocessing/OutlinePass.js"></script>
 
     <script>
       var scene = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      var outlinePass = new THREE.OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera );
+      var raycaster = new THREE.Raycaster();
+      var mouse = new THREE.Vector2();
+      var selectedObjects = [];
 
       var renderer = new THREE.WebGLRenderer();
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -31,8 +36,29 @@
       //renderer.gammaInput = true;
       //renderer.gammaOutput = true;
       document.body.appendChild(renderer.domElement);
+      document.addEventListener('touchstart', onDocumentTouchStart, false);
+      document.addEventListener('mousedown', onDocumentMouseDown, false);
       scene.background = new THREE.Color(0xFF00FF);
 
+      function onDocumentMouseDown (event)
+      {
+        event.preventDefault();
+					mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
+					mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
+					raycaster.setFromCamera( mouse, camera );
+
+          raycaster.setFromCamera( mouse, camera );
+					var intersects = raycaster.intersectObjects( [ scene ], true );
+					if ( intersects.length > 0 ) {
+						var selectedObject = intersects[ 0 ].object;
+						addSelectedObject( selectedObject );
+						outlinePass.selectedObjects = selectedObjects;
+					} else {
+						// outlinePass.selectedObjects = [];
+					}
+      }
+      window.addEventListener( 'mousemove', onTouchMove );
+			window.addEventListener( 'touchmove', onTouchMove );
 
       window.addEventListener('resize', function()
       {
@@ -42,6 +68,17 @@
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
       });
+
+      function onDocumentTouchStart(event)
+      {
+        event.preventDefault();
+
+        event.clientX = event.touches[0].clientX;
+        event.clientY = event.touches[0].clientY;
+        onDocumentMouseDown(event);
+      }
+
+
 
       controls = new THREE.OrbitControls(camera, renderer.domElement);
 
@@ -119,13 +156,42 @@
 
       var shadowqual = 4096;
 
-      var spotLight = new THREE.SpotLight(0xffffff, 1.5);
+      var spotLight = new THREE.SpotLight(0xffffff, 1);
       spotLight.position.set(4, 3, 6);
       spotLight.castShadow = true;
       spotLight.shadow.bias = -.002;
       spotLight.shadow.mapSize.width = shadowqual;
       spotLight.shadow.mapSize.height = shadowqual;
       scene.add(spotLight);
+
+      function onTouchMove( event ) {
+					var x, y;
+					if ( event.changedTouches ) {
+						x = event.changedTouches[ 0 ].pageX;
+						y = event.changedTouches[ 0 ].pageY;
+					} else {
+						x = event.clientX;
+						y = event.clientY;
+					}
+					mouse.x = ( x / window.innerWidth ) * 2 - 1;
+					mouse.y = - ( y / window.innerHeight ) * 2 + 1;
+					checkIntersection();
+				}
+				function addSelectedObject( object ) {
+					selectedObjects = [];
+					selectedObjects.push( object );
+				}
+				function checkIntersection() {
+					raycaster.setFromCamera( mouse, camera );
+					var intersects = raycaster.intersectObjects( [ scene ], true );
+					if ( intersects.length > 0 ) {
+						var selectedObject = intersects[ 0 ].object;
+						addSelectedObject( selectedObject );
+						outlinePass.selectedObjects = selectedObjects;
+					} else {
+						// outlinePass.selectedObjects = [];
+					}
+				}
 
 
       var update= function ()
