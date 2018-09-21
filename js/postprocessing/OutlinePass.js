@@ -122,8 +122,6 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 
 };
 
-var prototype;
-
 THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.OutlinePass,
