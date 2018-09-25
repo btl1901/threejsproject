@@ -19,7 +19,8 @@
   <body>
     <script src="js/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/STLLoader.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
+    <script src="js/loaders/STLLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 
@@ -31,10 +32,6 @@
 		<script src="js/postprocessing/OutlinePass.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
-
-		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Outline Pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
-		</div>
 
 		<script>
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -83,8 +80,10 @@
 			var controllerHidden = gui.addColor( conf, 'hiddenEdgeColor' ).onChange( function ( value ) {
 				outlinePass.hiddenEdgeColor.set( value );
 			} );
+
 			init();
 			animate();
+
 			function init() {
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -99,18 +98,19 @@
 				camera = new THREE.PerspectiveCamera( 45, width / height, 0.1, 100 );
 				camera.position.set( 0, 0, 8 );
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 5;
-				controls.maxDistance = 20;
-				controls.enablePan = false;
+				//controls.minDistance = 5;
+				//controls.maxDistance = 20;
+				controls.enablePan = true;
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.25;
 				//
-				scene.add( new THREE.AmbientLight( 0xaaaaaa, 0.2 ) );
+				scene.add( new THREE.AmbientLight( 0x00ffff, 0.2 ) );
 				var light = new THREE.DirectionalLight( 0xddffdd, 0.6 );
 				light.position.set( 1, 1, 1 );
 				light.castShadow = true;
-				light.shadow.mapSize.width = 1024;
-				light.shadow.mapSize.height = 1024;
+        var squal = 4096;
+				light.shadow.mapSize.width = squal;
+				light.shadow.mapSize.height = squal;
 				var d = 10;
 				light.shadow.camera.left = - d;
 				light.shadow.camera.right = d;
@@ -123,9 +123,11 @@
 				manager.onProgress = function ( item, loaded, total ) {
 					console.log( item, loaded, total );
 				};
+
+
 				var loader = new THREE.OBJLoader( manager );
-				loader.load( 'models/obj/tree.obj', function ( object ) {
-					var scale = 1.0;
+				loader.load( 'models/int2.obj', function ( object ) {
+					var scale = 1;
 					object.traverse( function ( child ) {
 						if ( child instanceof THREE.Mesh ) {
 							child.geometry.center();
@@ -141,10 +143,33 @@
 					object.scale.divideScalar( scale );
 					obj3d.add( object );
 				} );
+
+        /*
+        var loader = new THREE.STLLoader( manager );
+				loader.load( 'models/droid.stl', function ( object ) {
+					var scale = 10;
+					object.traverse( function ( child ) {
+						if ( child instanceof THREE.Mesh ) {
+							child.geometry.center();
+							child.geometry.computeBoundingSphere();
+							scale = 0.2 * child.geometry.boundingSphere.radius;
+							var phongMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 5 } );
+							child.material = phongMaterial;
+							child.receiveShadow = true;
+							child.castShadow = true;
+						}
+					} );
+					object.position.y = 1;
+					object.scale.divideScalar( scale );
+					obj3d.add( object );
+				} );
+        */
+
 				scene.add( group );
 				group.add( obj3d );
 				//
 				var geometry = new THREE.SphereBufferGeometry( 3, 48, 24 );
+
 				for ( var i = 0; i < 20; i ++ ) {
 					var material = new THREE.MeshLambertMaterial();
 					material.color.setHSL( Math.random(), 1.0, 0.3 );
@@ -155,14 +180,15 @@
 					mesh.receiveShadow = true;
 					mesh.castShadow = true;
 					mesh.scale.multiplyScalar( Math.random() * 0.3 + 0.1 );
-					group.add( mesh );
+					//group.add( mesh );
 				}
+
 				var floorMaterial = new THREE.MeshLambertMaterial( { side: THREE.DoubleSide } );
 				var floorGeometry = new THREE.PlaneBufferGeometry( 12, 12 );
 				var floorMesh = new THREE.Mesh( floorGeometry, floorMaterial );
 				floorMesh.rotation.x -= Math.PI * 0.5;
 				floorMesh.position.y -= 1.5;
-				group.add( floorMesh );
+				//group.add( floorMesh );
 				floorMesh.receiveShadow = true;
 				var geometry = new THREE.TorusBufferGeometry( 1, 0.3, 16, 100 );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffaaff } );
@@ -180,11 +206,13 @@
 				composer.addPass( renderPass );
 				outlinePass = new THREE.OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera );
 				composer.addPass( outlinePass );
+
 				var onLoad = function ( texture ) {
 					outlinePass.patternTexture = texture;
 					texture.wrapS = THREE.RepeatWrapping;
 					texture.wrapT = THREE.RepeatWrapping;
 				};
+
 				var loader = new THREE.TextureLoader();
 				loader.load( 'textures/tri_pattern.jpg', onLoad );
 				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
@@ -194,6 +222,7 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 				window.addEventListener( 'mousemove', onTouchMove );
 				window.addEventListener( 'touchmove', onTouchMove );
+
 				function onTouchMove( event ) {
 					var x, y;
 					if ( event.changedTouches ) {
@@ -207,10 +236,12 @@
 					mouse.y = - ( y / window.innerHeight ) * 2 + 1;
 					checkIntersection();
 				}
+
 				function addSelectedObject( object ) {
 					selectedObjects = [];
 					selectedObjects.push( object );
 				}
+
 				function checkIntersection() {
 					raycaster.setFromCamera( mouse, camera );
 					var intersects = raycaster.intersectObjects( [ scene ], true );
@@ -223,6 +254,7 @@
 					}
 				}
 			}
+
 			function onWindowResize() {
 				var width = window.innerWidth;
 				var height = window.innerHeight;
@@ -232,6 +264,7 @@
 				composer.setSize( width, height );
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 			}
+
 			function animate() {
 				requestAnimationFrame( animate );
 				stats.begin();
