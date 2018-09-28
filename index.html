@@ -43,6 +43,8 @@
 			var composer, effectFXAA, outlinePass;
 			var obj3d = new THREE.Object3D();
 			var group = new THREE.Group();
+
+      /*
 			var params = {
 				edgeStrength: 3.0,
 				edgeGlow: 0.0,
@@ -73,7 +75,7 @@
 
 			var Configuration = function () {
 				this.visibleEdgeColor = '#000000';
-				this.hiddenEdgeColor = '#000000';
+				this.hiddenEdgeColor =  '#000000';
 			};
 			var conf = new Configuration();
 
@@ -86,6 +88,7 @@
 			var controllerHidden = gui.addColor( conf, 'hiddenEdgeColor' ).onChange( function ( value ) {
 				outlinePass.hiddenEdgeColor.set( value );
 			} );
+      */
 
 
 
@@ -109,26 +112,36 @@
 				camera = new THREE.PerspectiveCamera( 45, width / height, 0.1, 100 );
 				camera.position.set( 0, 0, 8 );
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
+        camera.position.y = 4;
 				//controls.minDistance = 5;
 				//controls.maxDistance = 20;
+        controls.maxPolarAngle = Math.PI/2 - .1;
 				controls.enablePan = true;
 				controls.enableDamping = true;
-				controls.dampingFactor = 0.25;
+				controls.dampingFactor = .1;
 				//
-				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
+				//scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
 				var light = new THREE.DirectionalLight( 0x00ffff, 0.6 );
 				light.position.set( 1, 1, 1 );
 				light.castShadow = true;
-        var squal = 4096;
+        var squal = 6144;
 				light.shadow.mapSize.width = squal;
 				light.shadow.mapSize.height = squal;
 				var d = 10;
-				light.shadow.camera.left = - d;
-				light.shadow.camera.right = d;
-				light.shadow.camera.top = d;
-				light.shadow.camera.bottom = - d;
-				light.shadow.camera.far = 1000;
-				scene.add( light );
+				//light.shadow.camera.left = - d;
+				//light.shadow.camera.right = d;
+				//light.shadow.camera.top = d;
+				//light.shadow.camera.bottom = - d;
+				//light.shadow.camera.far = 1000;
+				//scene.add( light );
+
+        var spotLight = new THREE.SpotLight(0xffffff, 1);
+        spotLight.position.set(3, 5, 3);
+        spotLight.castShadow = true;
+        spotLight.shadow.bias = -.002;
+        spotLight.shadow.mapSize.width = squal;
+        spotLight.shadow.mapSize.height = squal;
+        scene.add(spotLight);
 
         scene.background = new THREE.Color(0xFF00FF);
 				// model
@@ -146,9 +159,11 @@
 							child.geometry.center();
 							child.geometry.computeBoundingSphere();
 							scale = 0.2 * child.geometry.boundingSphere.radius;
-							var phongMaterial = new THREE.MeshPhongMaterial( { color: 0xbbfbfb, specular: 0xffffff, shininess: 5 } );
+							var phongMaterial = new THREE.MeshPhongMaterial( { color: 0x00cccc, specular: 0xffffff, shininess: 0 } );
 							child.material = phongMaterial;
 							child.receiveShadow = true;
+              child.visibleEdgeColor = '#ffffff';
+      				child.hiddenEdgeColor =  '#000000';
 							child.castShadow = true;
 						}
 					} );
@@ -156,6 +171,24 @@
 					object.scale.divideScalar( scale );
 					obj3d.add( object );
 				} );
+
+        var plane = new THREE.Mesh
+        (
+          new THREE.PlaneBufferGeometry(10, 10),
+          new THREE.MeshPhongMaterial({color:0xffff00, specular: 0xffffff, shininess: 0})
+        );
+        plane.rotation.x = -Math.PI / 2;
+        plane.position.y = 0.1;
+        scene.add(plane);
+        plane.receiveShadow = true;
+
+        var sp = new THREE.Mesh
+        (
+          new THREE.SphereBufferGeometry(2, 2),
+          new THREE.MeshPhongMaterial({color:0xffff00, specular: 0xffffff, shininess: 0})
+        );
+        sp.position.set(4, 3, 6);
+        //scene.add(sp);
 
         /*
         var loader = new THREE.STLLoader( manager );
@@ -207,7 +240,7 @@
 				var material = new THREE.MeshPhongMaterial( { color: 0xffaaff } );
 				var torus = new THREE.Mesh( geometry, material );
 				torus.position.z = - 4;
-				group.add( torus );
+				//group.add( torus );
 				torus.receiveShadow = true;
 				torus.castShadow = true;
 				//
@@ -263,7 +296,7 @@
 						addSelectedObject( selectedObject );
 						outlinePass.selectedObjects = selectedObjects;
 					} else {
-						// outlinePass.selectedObjects = [];
+						outlinePass.selectedObjects = [];
 					}
 				}
 			}
@@ -282,9 +315,11 @@
 				requestAnimationFrame( animate );
 				stats.begin();
 				var timer = performance.now();
-				if ( params.rotate ) {
+        /*
+        if ( params.rotate ) {
 					group.rotation.y = timer * 0.0001;
 				}
+        */
 				controls.update();
 				composer.render();
 				stats.end();
