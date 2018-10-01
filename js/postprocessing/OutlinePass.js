@@ -11,8 +11,8 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 	this.hiddenEdgeColor = new THREE.Color( 0, 0, 0 );
 	this.edgeGlow = 0.0;
 	this.usePatternTexture = false;
-	this.edgeThickness = 1.0;
-	this.edgeStrength = 3.0;
+	this.edgeThickness = 3.0;
+	this.edgeStrength = 10.0;
 	this.downSampleRatio = 2;
 	this.pulsePeriod = 0;
 

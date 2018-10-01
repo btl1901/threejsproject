@@ -39,6 +39,7 @@
 			var camera, scene, renderer, controls;
 			var raycaster = new THREE.Raycaster();
 			var mouse = new THREE.Vector2();
+      var tmouse = new THREE.Vector2();
 			var selectedObjects = [];
 			var composer, effectFXAA, outlinePass;
 			var obj3d = new THREE.Object3D();
@@ -118,11 +119,11 @@
         controls.maxPolarAngle = Math.PI/2 - .1;
 				controls.enablePan = true;
 				controls.enableDamping = true;
-				controls.dampingFactor = .1;
+				controls.dampingFactor = .6;
 				//
-				//scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
-				var light = new THREE.DirectionalLight( 0x00ffff, 0.6 );
-				light.position.set( 1, 1, 1 );
+				//scene.add( new THREE.AmbientLight( 0xffffff, 1 ) );
+				var light = new THREE.DirectionalLight( 0xffffff, .8 );
+				light.position.set( 1, 2, 1 );
 				light.castShadow = true;
         var squal = 6144;
 				light.shadow.mapSize.width = squal;
@@ -133,15 +134,15 @@
 				//light.shadow.camera.top = d;
 				//light.shadow.camera.bottom = - d;
 				//light.shadow.camera.far = 1000;
-				//scene.add( light );
+				scene.add( light );
 
         var spotLight = new THREE.SpotLight(0xffffff, 1);
         spotLight.position.set(3, 5, 3);
         spotLight.castShadow = true;
-        spotLight.shadow.bias = -.002;
+        spotLight.shadow.bias = .5;
         spotLight.shadow.mapSize.width = squal;
         spotLight.shadow.mapSize.height = squal;
-        scene.add(spotLight);
+        //scene.add(spotLight);
 
         scene.background = new THREE.Color(0xFF00FF);
 				// model
@@ -266,14 +267,31 @@
 				effectFXAA.renderToScreen = true;
 				composer.addPass( effectFXAA );
 				window.addEventListener( 'resize', onWindowResize, false );
-				window.addEventListener( 'mousemove', onTouchMove );
-				window.addEventListener( 'touchmove', onTouchMove );
+				//window.addEventListener( 'mousemove', onTouchMove );
+				//window.addEventListener( 'touchmove', onTouchMove );
+        window.addEventListener( 'click', pick);
+
+        var clicked = false;
+
+        function pick(event)
+        {
+          raycaster.setFromCamera( mouse, camera );
+					var intersects = raycaster.intersectObjects( [ scene ], true );
+					if ( intersects.length > 0 & clicked) {
+            clicked = !clicked;
+						var selectedObject = intersects[ 0 ].object;
+						addSelectedObject( selectedObject );
+						outlinePass.selectedObjects = selectedObjects;
+					} else {
+						outlinePass.selectedObjects = [];
+					}
+        }
 
 				function onTouchMove( event ) {
 					var x, y;
-					if ( event.changedTouches ) {
-						x = event.changedTouches[ 0 ].pageX;
-						y = event.changedTouches[ 0 ].pageY;
+					if ( event.touches ) {
+						x = event.touches[ 0 ].pageX;
+						y = event.touches[ 0 ].pageY;
 					} else {
 						x = event.clientX;
 						y = event.clientY;
