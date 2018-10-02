@@ -153,13 +153,13 @@
 
 
 				var loader = new THREE.OBJLoader( manager );
-				loader.load( 'models/slls.obj', function ( object ) {
+				loader.load( 'models/coob.obj', function ( object ) {
 					var scale = 1;
 					object.traverse( function ( child ) {
 						if ( child instanceof THREE.Mesh ) {
 							child.geometry.center();
 							child.geometry.computeBoundingSphere();
-							scale = 0.2 * child.geometry.boundingSphere.radius;
+							scale = .87 * child.geometry.boundingSphere.radius;
 							var phongMaterial = new THREE.MeshPhongMaterial( { color: 0x00cccc, specular: 0xffffff, shininess: 0 } );
 							child.material = phongMaterial;
 							child.receiveShadow = true;
@@ -180,7 +180,7 @@
         );
         plane.rotation.x = -Math.PI / 2;
         plane.position.y = 0.1;
-        scene.add(plane);
+        //scene.add(plane);
         plane.receiveShadow = true;
 
         var sp = new THREE.Mesh
@@ -269,21 +269,35 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 				//window.addEventListener( 'mousemove', onTouchMove );
 				//window.addEventListener( 'touchmove', onTouchMove );
-        window.addEventListener( 'click', pick);
+        window.addEventListener( 'mousedown', pick);
+        //window.addEventListener( 'touchstart', pick);
 
         var clicked = false;
 
         function pick(event)
         {
+          clicked = !clicked;
           raycaster.setFromCamera( mouse, camera );
 					var intersects = raycaster.intersectObjects( [ scene ], true );
-					if ( intersects.length > 0 & clicked) {
-            clicked = !clicked;
-						var selectedObject = intersects[ 0 ].object;
-						addSelectedObject( selectedObject );
-						outlinePass.selectedObjects = selectedObjects;
+					if ( intersects.length > 0) { //  and not infinite
+            console.log(intersects);
+            if (clicked)
+            {
+              var selectedObject = intersects[ 0 ].object;
+  						addSelectedObject( selectedObject );
+  						outlinePass.selectedObjects = selectedObjects;
+              scene.background = new THREE.Color(0x0000FF);
+            }
+            else
+            {
+              scene.background = new THREE.Color(0x00FF00);
+            }
+            //clicked = !clicked;
+
+
 					} else {
 						outlinePass.selectedObjects = [];
+            scene.background = new THREE.Color(0xFF00FF);
 					}
         }
 
