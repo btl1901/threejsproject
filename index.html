@@ -148,7 +148,7 @@
 				// model
 				var manager = new THREE.LoadingManager();
 				manager.onProgress = function ( item, loaded, total ) {
-					console.log( item, loaded, total );
+					//console.log( item, loaded, total );
 				};
 
 
@@ -159,13 +159,14 @@
 						if ( child instanceof THREE.Mesh ) {
 							child.geometry.center();
 							child.geometry.computeBoundingSphere();
-							scale = .87 * child.geometry.boundingSphere.radius;
+							scale = .2 * child.geometry.boundingSphere.radius;
 							var phongMaterial = new THREE.MeshPhongMaterial( { color: 0x00cccc, specular: 0xffffff, shininess: 0 } );
 							child.material = phongMaterial;
 							child.receiveShadow = true;
               child.visibleEdgeColor = '#ffffff';
       				child.hiddenEdgeColor =  '#000000';
 							child.castShadow = true;
+              console.log(child.geometry.boundingSphere.radius);
 						}
 					} );
 					object.position.y = 1;
@@ -267,8 +268,8 @@
 				effectFXAA.renderToScreen = true;
 				composer.addPass( effectFXAA );
 				window.addEventListener( 'resize', onWindowResize, false );
-				//window.addEventListener( 'mousemove', onTouchMove );
-				//window.addEventListener( 'touchmove', onTouchMove );
+				window.addEventListener( 'mousemove', onTouchMove );
+				window.addEventListener( 'touchmove', onTouchMove );
         window.addEventListener( 'mousedown', pick);
         //window.addEventListener( 'touchstart', pick);
 
@@ -276,29 +277,38 @@
 
         function pick(event)
         {
-          clicked = !clicked;
+          /*
           raycaster.setFromCamera( mouse, camera );
 					var intersects = raycaster.intersectObjects( [ scene ], true );
-					if ( intersects.length > 0) { //  and not infinite
+					if ( intersects.length > 0)
+          { //  and not background
             console.log(intersects);
+            clicked = !clicked;
             if (clicked)
             {
+
               var selectedObject = intersects[ 0 ].object;
   						addSelectedObject( selectedObject );
   						outlinePass.selectedObjects = selectedObjects;
               scene.background = new THREE.Color(0x0000FF);
+              console.log(intersects[0].faceIndex);
             }
             else
             {
+              outlinePass.selectedObjects = [];
               scene.background = new THREE.Color(0x00FF00);
+              console.log(intersects[0].faceIndex);
             }
             //clicked = !clicked;
 
 
 					} else {
+            clicked = !clicked;
 						outlinePass.selectedObjects = [];
             scene.background = new THREE.Color(0xFF00FF);
 					}
+          */
+          clicked = !clicked;
         }
 
 				function onTouchMove( event ) {
@@ -312,7 +322,7 @@
 					}
 					mouse.x = ( x / window.innerWidth ) * 2 - 1;
 					mouse.y = - ( y / window.innerHeight ) * 2 + 1;
-					checkIntersection();
+          checkIntersection();
 				}
 
 				function addSelectedObject( object ) {
@@ -323,13 +333,17 @@
 				function checkIntersection() {
 					raycaster.setFromCamera( mouse, camera );
 					var intersects = raycaster.intersectObjects( [ scene ], true );
-					if ( intersects.length > 0 ) {
+					if ( intersects.length > 0  && clicked) {
 						var selectedObject = intersects[ 0 ].object;
 						addSelectedObject( selectedObject );
 						outlinePass.selectedObjects = selectedObjects;
 					} else {
-						outlinePass.selectedObjects = [];
+						//outlinePass.selectedObjects = [];
 					}
+          if (!clicked)
+          {
+            outlinePass.selectedObjects = [];
+          }
 				}
 			}
 
