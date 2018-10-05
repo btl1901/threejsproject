@@ -269,14 +269,32 @@
 				composer.addPass( effectFXAA );
 				window.addEventListener( 'resize', onWindowResize, false );
 				window.addEventListener( 'mousemove', onTouchMove );
-				window.addEventListener( 'touchmove', onTouchMove );
+				//window.addEventListener( 'touchmove', onTouchMove );
         window.addEventListener( 'mousedown', pick);
-        //window.addEventListener( 'touchstart', pick);
+        //window.addEventListener( 'mousedown', pick);
+        window.addEventListener( 'touchstart', prepick);
+        window.addEventListener( 'touchmove', startedonmesh, true);
 
         var clicked = false;
+        var star = false;
+
+        function prepick(event)
+        {
+          window.setTimeout(pick(event), 1000);
+        }
+
+        function sleep(milliseconds) {
+          var start = new Date().getTime();
+          for (var i = 0; i < 1e7; i++) {
+            if ((new Date().getTime() - start) > milliseconds){
+              break;
+            }
+          }
+        }
 
         function pick(event)
         {
+          sleep(150);
           /*
           raycaster.setFromCamera( mouse, camera );
 					var intersects = raycaster.intersectObjects( [ scene ], true );
@@ -308,7 +326,36 @@
             scene.background = new THREE.Color(0xFF00FF);
 					}
           */
+
           clicked = !clicked;
+
+          var x, y;
+					if ( event.touches ) {
+						x = event.touches[ 0 ].pageX;
+						y = event.touches[ 0 ].pageY;
+					} else {
+						x = event.clientX;
+						y = event.clientY;
+					}
+					mouse.x = ( x / window.innerWidth ) * 2 - 1;
+					mouse.y = - ( y / window.innerHeight ) * 2 + 1;
+          checkIntersection();
+        }
+
+        function startedonmesh(event)
+        {
+          //selectedObjects = [];
+          clicked = false;
+          checkIntersection();
+          //star = !star;
+          if (star)
+          {
+            //scene.background = new THREE.Color(0x00FF00);
+          }
+          else
+          {
+            //scene.background = new THREE.Color(0x0000ff);
+          }
         }
 
 				function onTouchMove( event ) {
